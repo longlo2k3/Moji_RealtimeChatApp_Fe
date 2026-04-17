@@ -55,7 +55,7 @@ export const useChatStore = create<ChatState>()(
         try {
           const { messages: fetched, cursor } = await chatService.fetchMessages(
             convoId,
-            nextCursor
+            nextCursor,
           );
 
           const processed = fetched.map((m) => ({
@@ -65,7 +65,8 @@ export const useChatStore = create<ChatState>()(
 
           set((state) => {
             const prev = state.messages[convoId]?.items ?? [];
-            const merged = prev.length > 0 ? [...processed, ...prev] : processed;
+            const merged =
+              prev.length > 0 ? [...processed, ...prev] : processed;
 
             return {
               messages: {
@@ -91,11 +92,11 @@ export const useChatStore = create<ChatState>()(
             recipientId,
             content,
             imgUrl,
-            activeConversationId || undefined
+            activeConversationId || undefined,
           );
           set((state) => ({
             conversations: state.conversations.map((c) =>
-              c._id === activeConversationId ? { ...c, seenBy: [] } : c
+              c._id === activeConversationId ? { ...c, seenBy: [] } : c,
             ),
           }));
         } catch (error) {
@@ -107,7 +108,7 @@ export const useChatStore = create<ChatState>()(
           await chatService.sendGroupMessage(conversationId, content, imgUrl);
           set((state) => ({
             conversations: state.conversations.map((c) =>
-              c._id === get().activeConversationId ? { ...c, seenBy: [] } : c
+              c._id === get().activeConversationId ? { ...c, seenBy: [] } : c,
             ),
           }));
         } catch (error) {
@@ -150,10 +151,10 @@ export const useChatStore = create<ChatState>()(
           console.error("Lỗi xảy khi ra add message:", error);
         }
       },
-      updateConversation: (conversation) => {
+      updateConversation: (conversation: any) => {
         set((state) => ({
           conversations: state.conversations.map((c) =>
-            c._id === conversation._id ? { ...c, ...conversation } : c
+            c._id === conversation._id ? { ...c, ...conversation } : c,
           ),
         }));
       },
@@ -166,7 +167,9 @@ export const useChatStore = create<ChatState>()(
             return;
           }
 
-          const convo = conversations.find((c) => c._id === activeConversationId);
+          const convo = conversations.find(
+            (c) => c._id === activeConversationId,
+          );
 
           if (!convo) {
             return;
@@ -188,7 +191,7 @@ export const useChatStore = create<ChatState>()(
                       [user._id]: 0,
                     },
                   }
-                : c
+                : c,
             ),
           }));
         } catch (error) {
@@ -198,7 +201,7 @@ export const useChatStore = create<ChatState>()(
       addConvo: (convo) => {
         set((state) => {
           const exists = state.conversations.some(
-            (c) => c._id.toString() === convo._id.toString()
+            (c) => c._id.toString() === convo._id.toString(),
           );
 
           return {
@@ -215,7 +218,7 @@ export const useChatStore = create<ChatState>()(
           const conversation = await chatService.createConversation(
             type,
             name,
-            memberIds
+            memberIds,
           );
 
           get().addConvo(conversation);
@@ -224,7 +227,10 @@ export const useChatStore = create<ChatState>()(
             .getState()
             .socket?.emit("join-conversation", conversation._id);
         } catch (error) {
-          console.error("Lỗi xảy ra khi gọi createConversation trong store", error);
+          console.error(
+            "Lỗi xảy ra khi gọi createConversation trong store",
+            error,
+          );
         } finally {
           set({ loading: false });
         }
@@ -233,6 +239,6 @@ export const useChatStore = create<ChatState>()(
     {
       name: "chat-storage",
       partialize: (state) => ({ conversations: state.conversations }),
-    }
-  )
+    },
+  ),
 );
