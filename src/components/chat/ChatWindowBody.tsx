@@ -3,6 +3,7 @@ import ChatWelcomeScreen from "./ChatWelcomeScreen";
 import MessageItem from "./MessageItem";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Spin from "../ui/spin";
 
 const ChatWindowBody = () => {
   const {
@@ -11,14 +12,16 @@ const ChatWindowBody = () => {
     messages: allMessages,
     fetchMessages,
   } = useChatStore();
-  const [lastMessageStatus, setLastMessageStatus] = useState<"delivered" | "seen">(
-    "delivered"
-  );
+  const [lastMessageStatus, setLastMessageStatus] = useState<
+    "delivered" | "seen"
+  >("delivered");
 
   const messages = allMessages[activeConversationId!]?.items ?? [];
   const reversedMessages = [...messages].reverse();
   const hasMore = allMessages[activeConversationId!]?.hasMore ?? false;
-  const selectedConvo = conversations.find((c) => c._id === activeConversationId);
+  const selectedConvo = conversations.find(
+    (c) => c._id === activeConversationId,
+  );
   const key = `chat-scroll-${activeConversationId}`;
 
   // ref
@@ -41,7 +44,10 @@ const ChatWindowBody = () => {
   useLayoutEffect(() => {
     if (!messagesEndRef.current) return;
 
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
   }, [activeConversationId]);
 
   const fetchMoreMessages = async () => {
@@ -67,7 +73,7 @@ const ChatWindowBody = () => {
       JSON.stringify({
         scrollTop: container.scrollTop,
         scrollHeight: container.scrollHeight,
-      })
+      }),
     );
   };
 
@@ -111,7 +117,7 @@ const ChatWindowBody = () => {
           next={fetchMoreMessages}
           hasMore={hasMore}
           scrollableTarget="scrollableDiv"
-          loader={<p>Đang tải...</p>}
+          loader={<Spin />}
           inverse={true}
           style={{
             display: "flex",

@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router";
+import Spin from "../ui/spin";
 
 const ProtectedRoute = () => {
   const { accessToken, user, loading, refresh, fetchMe } = useAuthStore();
@@ -26,18 +27,13 @@ const ProtectedRoute = () => {
   if (starting || loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Đang tải trang...
+        <Spin title="Đang tải trang..." />
       </div>
     );
   }
 
   if (!accessToken) {
-    return (
-      <Navigate
-        to="/signin"
-        replace
-      />
-    );
+    return <Navigate to="/signin" replace />;
   }
 
   return <Outlet></Outlet>;

@@ -3,6 +3,9 @@ import { io, type Socket } from "socket.io-client";
 import { useAuthStore } from "./useAuthStore";
 import type { SocketState } from "@/types/store";
 import { useChatStore } from "./useChatStore";
+import { useFriendStore } from "./useFriendStore";
+import { toast } from "sonner";
+import { playNotificationSound } from "@/lib/sound";
 
 const baseURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -31,9 +34,26 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ onlineUsers: userIds });
     });
 
+    // new friend request
+    socket.on("new-friend-request", (request) => {
+      useFriendStore.getState().getAllFriendRequests();
+      playNotificationSound();
+      toast.info(
+        `Bạn có lời mời kết bạn từ ${request.from?.displayName || "ai đó"}`,
+      );
+    });
+
     // new message
     socket.on("new-message", ({ message, conversation, unreadCounts }) => {
       useChatStore.getState().addMessage(message);
+
+      const targetConvo = useChatStore
+        .getState()
+        .conversations.find((c) => c._id === conversation._id);
+      const sender = targetConvo?.participants.find(
+        (p) => p._id === message.senderId,
+      );
+      const senderName = sender?.displayName || "ai đó";
 
       const lastMessage = {
         _id: conversation.lastMessage._id,
@@ -41,8 +61,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         createdAt: conversation.lastMessage.createdAt,
         sender: {
           _id: conversation.lastMessage.senderId,
-          displayName: "",
-          avatarUrl: null,
+          displayName: senderName,
+          avatarUrl: sender?.avatarUrl || null,
         },
       };
 
@@ -52,8 +72,32 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         unreadCounts,
       };
 
-      if (useChatStore.getState().activeConversationId === message.conversationId) {
+      const myId = useAuthStore.getState().user?._id;
+
+      if (
+        useChatStore.getState().activeConversationId === message.conversationId
+      ) {
         useChatStore.getState().markAsSeen();
+      } else {
+        if (message.senderId !== myId) {
+          const groupName = targetConvo?.group?.name;
+          const title =
+            targetConvo?.type === "group"
+              ? `Tin nhắn mới trong ${groupName}`
+              : `Tin nhắn mới từ ${senderName}`;
+          playNotificationSound();
+          toast.info(title, {
+            description: message.content || "Đã gửi một ảnh",
+            action: {
+              label: "Xem",
+              onClick: () => {
+                useChatStore
+                  .getState()
+                  .setActiveConversation(message.conversationId);
+              },
+            },
+          });
+        }
       }
 
       useChatStore.getState().updateConversation(updatedConversation);

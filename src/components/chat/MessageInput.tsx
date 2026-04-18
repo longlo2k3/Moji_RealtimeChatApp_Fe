@@ -20,6 +20,10 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
     const currValue = value;
     setValue("");
 
+    console.log("selectedConvo", selectedConvo);
+    console.log("value", value);
+    console.log("user", user);
+
     try {
       if (selectedConvo.type === "direct") {
         const participants = selectedConvo.participants;

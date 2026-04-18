@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import SearchForm from "@/components/AddFriendModal/SearchForm";
 import SendFriendRequestForm from "@/components/AddFriendModal/SendFriendRequestForm";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export interface IFormValues {
   username: string;
@@ -24,6 +25,7 @@ const AddFriendModal = () => {
   const [searchUser, setSearchUser] = useState<User>();
   const [searchedUsername, setSearchedUsername] = useState("");
   const { loading, searchByUsername, addFriend } = useFriendStore();
+  const { user } = useAuthStore();
 
   const {
     register,
