@@ -54,7 +54,7 @@ export function SignupForm({
                   <img src="/logo.svg" alt="logo" />
                 </a>
 
-                <h1 className="text-2xl font-bold">Tạo tài khoản LongVi</h1>
+                <h1 className="text-2xl font-bold">Tạo tài khoản LongVy</h1>
                 <p className="text-muted-foreground text-balance">
                   Chào mừng bạn! Hãy đăng ký để bắt đầu!
                 </p>

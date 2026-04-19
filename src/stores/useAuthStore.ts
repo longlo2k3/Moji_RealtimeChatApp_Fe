@@ -58,7 +58,7 @@ export const useAuthStore = create<AuthState>()(
           await get().fetchMe();
           useChatStore.getState().fetchConversations();
 
-          toast.success("Chào mừng bạn quay lại với LongVi 🎉");
+          toast.success("Chào mừng bạn quay lại với LongVy 🎉");
         } catch (error) {
           console.error(error);
           toast.error("Đăng nhập không thành công!");
