@@ -8,6 +8,11 @@ import { useThemeStore } from "./stores/useThemeStore";
 import { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore";
 import { useSocketStore } from "./stores/useSocketStore";
+import {
+  messaging,
+  onMessage,
+  requestPermissionAndGetToken,
+} from "./services/FCM/firebase";
 
 function App() {
   const { isDark, setTheme } = useThemeStore();
@@ -26,9 +31,18 @@ function App() {
     return () => disconnectSocket();
   }, [accessToken]);
 
+  useEffect(() => {
+    requestPermissionAndGetToken();
+
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Message received:", payload);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
-      <Toaster richColors />
       <BrowserRouter>
         <Routes>
           {/* public routes */}

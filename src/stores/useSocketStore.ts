@@ -86,17 +86,23 @@ export const useSocketStore = create<SocketState>((set, get) => ({
               ? `Tin nhắn mới trong ${groupName}`
               : `Tin nhắn mới từ ${senderName}`;
           playNotificationSound();
-          toast.info(title, {
-            description: message.content || "Đã gửi một ảnh",
-            action: {
-              label: "Xem",
-              onClick: () => {
-                useChatStore
-                  .getState()
-                  .setActiveConversation(message.conversationId);
-              },
-            },
+
+          if (Notification.permission !== "granted") return;
+
+          const notification = new Notification(title, {
+            body: message.content,
           });
+
+          notification.onclick = () => {
+            const previousConversationId =
+              useChatStore.getState().activeConversationId;
+            if (
+              previousConversationId === message.conversationId ||
+              document.hidden
+            ) {
+              window.focus();
+            }
+          };
         }
       }
 
